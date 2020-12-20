@@ -1,6 +1,7 @@
 package com.example.it_fest_student_raiting;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,43 +14,39 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.it_fest_student_raiting.fragments.ChangeStudentFragment;
-import com.example.it_fest_student_raiting.model.Student;
+import com.example.it_fest_student_raiting.model.Client;
 
+import java.time.LocalDate;
 import java.util.List;
 
-public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ClientAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public boolean showAll = false;
     private LayoutInflater inflater;
-    private List<Student> students;
+    private List<Client> clients;
     private Context context;
 
 
-
-    public StudentAdapter(Context context, List<Student> students) {
+    public ClientAdapter(Context context, List<Client> clients) {
         this.inflater = LayoutInflater.from(context);
-        this.students = students;
+        this.clients = clients;
         this.context = context;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        final TextView tv_name,
-                tv_gr,
-                tv_score;
+        final TextView tvName,
+                tvArrivalDate,
+                tvCheckOutDate;
         final LinearLayout ll_item;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             ll_item = itemView.findViewById(R.id.ll_item);
-            tv_name = (TextView) itemView.findViewById(R.id.tv_name);
-            tv_gr = (TextView) itemView.findViewById(R.id.tv_gr);
-            tv_score = (TextView) itemView.findViewById(R.id.tv_score);
+            tvName = (TextView) itemView.findViewById(R.id.tv_name);
+            tvArrivalDate = (TextView) itemView.findViewById(R.id.tv_arrival_date);
+            tvCheckOutDate = (TextView) itemView.findViewById(R.id.tv_check_out_date);
         }
     }
-
-
-
-
-
 
 
     @NonNull
@@ -62,21 +59,20 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Student student = students.get(position);
+        Client client = clients.get(position);
 
-        if (position == 0){
-            ((MyViewHolder)holder).ll_item.setBackground(context.getDrawable(R.drawable.ic_golden_back));
-        }
-        if (position == 1){
-            ((MyViewHolder)holder).ll_item.setBackground(context.getDrawable(R.drawable.ic_silver_back));
-        }
-        if (position == 2){
-            ((MyViewHolder)holder).ll_item.setBackground(context.getDrawable(R.drawable.ic_bronze_back));
+        if (client.getStatus() == Client.Status.RESIDES) {
+            if (client.getCheckOutDate().compareTo(LocalDate.now()) < 0)
+                ((MyViewHolder) holder).ll_item.setBackground(context.getDrawable(R.drawable.ic_bronze_back));
+            else
+                ((MyViewHolder) holder).ll_item.setBackground(context.getDrawable(R.drawable.ic_normal_back));
+        } else {
+            ((MyViewHolder) holder).ll_item.setBackground(context.getDrawable(R.drawable.ic_silver_back));
         }
 
-        ((MyViewHolder)holder).tv_name.setText(student.getName());
-        ((MyViewHolder)holder).tv_gr.setText("Group: " + student.getGr());
-        ((MyViewHolder)holder).tv_score.setText( "Score: " + student.getScore().toString());
+        ((MyViewHolder) holder).tvName.setText(String.format("%s %s", client.getLastName(), client.getFirstName()));
+        ((MyViewHolder) holder).tvArrivalDate.setText(String.format("Заезд: %s", client.getArrivalDate().toString()));
+        ((MyViewHolder) holder).tvCheckOutDate.setText(String.format("Выселение: %s", client.getCheckOutDate()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,23 +80,23 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 ChangeStudentFragment changeStudentFragment = new ChangeStudentFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(MainActivity.MSG_NAME, students.get(position));
+                bundle.putSerializable(MainActivity.MSG_NAME, clients.get(position));
                 changeStudentFragment.setArguments(bundle);
 
-                ((AppCompatActivity)context).getSupportFragmentManager()
+                ((AppCompatActivity) context).getSupportFragmentManager()
                         .beginTransaction()
                         .add(R.id.fl_main, changeStudentFragment)
                         .commit();
             }
         });
 
+
     }
 
     @Override
     public int getItemCount() {
-        return students.size();
+        return clients.size();
     }
-
 
 
 }

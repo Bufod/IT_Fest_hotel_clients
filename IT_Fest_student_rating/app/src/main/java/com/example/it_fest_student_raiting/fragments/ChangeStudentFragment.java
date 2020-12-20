@@ -2,7 +2,6 @@ package com.example.it_fest_student_raiting.fragments;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
@@ -10,12 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.example.it_fest_student_raiting.MainActivity;
 import com.example.it_fest_student_raiting.R;
-import com.example.it_fest_student_raiting.db.StudentDbHelper;
-import com.example.it_fest_student_raiting.model.Student;
+import com.example.it_fest_student_raiting.db.ClientDbHelper;
+import com.example.it_fest_student_raiting.model.Client;
 
 public class ChangeStudentFragment extends Fragment {
 
@@ -31,41 +29,41 @@ public class ChangeStudentFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_change_student, container, false);
 
-        Student student = (Student) (getArguments().getSerializable(MainActivity.MSG_NAME));
+        Client client = (Client) (getArguments().getSerializable(MainActivity.MSG_NAME));
         /*StudentDbHelper dbHelper = new StudentDbHelper(getContext());
         dbHelper.changeStudent(student);
 
 
 */
-        et_name = view.findViewById(R.id.et_name);
-        et_group = view.findViewById(R.id.et_group);
-        et_score = view.findViewById(R.id.et_score);
-
-        et_name.setText( student.getName() );
-        et_group.setText( student.getGr() );
-        et_score.setText( student.getScore().toString() );
-
-        btn_save = (AppCompatButton) view.findViewById(R.id.btn_save);
-        btn_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                StudentDbHelper dbHelper = new StudentDbHelper( getContext() );
-
-
-
-                Student testStudent = new Student( student.getId(),
-                        et_name.getText().toString(),
-                        et_group.getText().toString(),
-                        Integer.valueOf( et_score.getText().toString() ));
-
-                dbHelper.changeStudent(testStudent);
-
-                getActivity().getSupportFragmentManager().beginTransaction().remove(ChangeStudentFragment.this).commit();
-
-                dbHelper.close();
-            }
-        });
+//        et_name = view.findViewById(R.id.et_name);
+//        et_group = view.findViewById(R.id.et_group);
+//        et_score = view.findViewById(R.id.et_score);
+//
+//        et_name.setText( client.getName() );
+//        et_group.setText( client.getGr() );
+//        et_score.setText( client.getScore().toString() );
+//
+//        btn_save = (AppCompatButton) view.findViewById(R.id.btn_save);
+//        btn_save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                ClientDbHelper dbHelper = new ClientDbHelper( getContext() );
+//
+//
+//
+//                Client testClient = new Client( client.getId(),
+//                        et_name.getText().toString(),
+//                        et_group.getText().toString(),
+//                        Integer.valueOf( et_score.getText().toString() ));
+//
+//                dbHelper.changeStudent(testClient);
+//
+//                getActivity().getSupportFragmentManager().beginTransaction().remove(ChangeStudentFragment.this).commit();
+//
+//                dbHelper.close();
+//            }
+//        });
 
         return view;
     }

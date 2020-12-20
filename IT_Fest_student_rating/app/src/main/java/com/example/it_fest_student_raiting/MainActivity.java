@@ -2,29 +2,20 @@ package com.example.it_fest_student_raiting;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.example.it_fest_student_raiting.db.StudentDbHelper;
-import com.example.it_fest_student_raiting.db.StudentReaderContract;
-import com.example.it_fest_student_raiting.fragments.AddStudentFragment;
+import com.example.it_fest_student_raiting.db.ClientDbHelper;
+import com.example.it_fest_student_raiting.fragments.AddClientFragment;
 import com.example.it_fest_student_raiting.fragments.ChangeStudentFragment;
-import com.example.it_fest_student_raiting.model.Student;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.it_fest_student_raiting.model.Client;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,34 +23,36 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     public static final String MSG_NAME = "msg";
-    AddStudentFragment addStudentFragment;
+    AddClientFragment addClientFragment;
     ChangeStudentFragment changeStudentFragment;
     FragmentTransaction transaction;
     FrameLayout frameLayout;
     RecyclerView rv_students;
 
-    List<Student> students;
+    List<Client> clients;
 
-    StudentDbHelper dbHelper;
-    StudentAdapter studentAdapter;
+    ClientDbHelper dbHelper;
+    ClientAdapter clientAdapter;
 
     ItemTouchHelper.SimpleCallback simpleItemTouchCallback;
+
+    boolean showAllClients = false;
 
     @Override
     protected void onResume() {
         super.onResume();
     }
 
-    public void update(){
-        students.clear();
-        students.addAll( dbHelper.getStudents() );
-        Collections.sort(students, new Comparator<Student>() {
+    public void update() {
+        clients.clear();
+        clients.addAll(dbHelper.getClients(showAllClients));
+        Collections.sort(clients, new Comparator<Client>() {
             @Override
-            public int compare(Student student, Student t1) {
-                return t1.getScore() - student.getScore();
+            public int compare(Client client1, Client client2) {
+                return client1.getCheckOutDate().compareTo(client2.getCheckOutDate());
             }
         });
-        studentAdapter.notifyDataSetChanged();
+        clientAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -67,21 +60,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dbHelper = new StudentDbHelper(this);
-        students = dbHelper.getStudents();
-        Collections.sort(students, new Comparator<Student>() {
+        dbHelper = new ClientDbHelper(this);
+        clients = dbHelper.getClients(showAllClients);
+        Collections.sort(clients, new Comparator<Client>() {
             @Override
-            public int compare(Student student, Student t1) {
-                return t1.getScore() - student.getScore();
+            public int compare(Client client1, Client client2) {
+                return client1.getCheckOutDate().compareTo(client2.getCheckOutDate());
             }
         });
 
-        addStudentFragment = new AddStudentFragment();
+        addClientFragment = new AddClientFragment();
         changeStudentFragment = new ChangeStudentFragment();
 
         rv_students = findViewById(R.id.rv_students);
-        studentAdapter = new StudentAdapter(this, students);
-        rv_students.setAdapter(studentAdapter);
+        clientAdapter = new ClientAdapter(this, clients);
+        rv_students.setAdapter(clientAdapter);
 
 
         frameLayout = findViewById(R.id.fl_main);
@@ -93,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 transaction = getSupportFragmentManager().beginTransaction();
-                transaction.add(R.id.fl_main, addStudentFragment);
+                transaction.add(R.id.fl_main, addClientFragment);
                 transaction.commit();
 
             }
@@ -109,13 +102,18 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                Toast.makeText(MainActivity.this, "on Swiped ", Toast.LENGTH_SHORT).show();
-                //Remove swiped item from list and notify the RecyclerView
                 int position = viewHolder.getAdapterPosition();
+                Client client = clients.get(position);
+                if (swipeDir == ItemTouchHelper.LEFT) {
+                    Toast.makeText(MainActivity.this, "on Swiped ", Toast.LENGTH_SHORT).show();
+                    dbHelper.deleteStudent(client);
 
-                dbHelper.deleteStudent(students.get(position));
-                students.remove(position);
-                studentAdapter.notifyDataSetChanged();
+                } else if (swipeDir == ItemTouchHelper.RIGHT) {
+                    client.setStatus(Client.Status.EVICTED);
+                    dbHelper.changeStudent(client);
+                }
+                clients.remove(position);
+                clientAdapter.notifyDataSetChanged();
 
             }
         };
