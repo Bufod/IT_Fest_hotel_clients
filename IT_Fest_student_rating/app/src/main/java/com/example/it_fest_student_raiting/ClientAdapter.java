@@ -1,7 +1,6 @@
 package com.example.it_fest_student_raiting;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.it_fest_student_raiting.fragments.ChangeStudentFragment;
+import com.example.it_fest_student_raiting.fragments.ChangeClientFragment;
 import com.example.it_fest_student_raiting.model.Client;
 
 import java.time.LocalDate;
@@ -21,7 +20,6 @@ import java.util.List;
 
 public class ClientAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public boolean showAll = false;
     private LayoutInflater inflater;
     private List<Client> clients;
     private Context context;
@@ -71,21 +69,21 @@ public class ClientAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         ((MyViewHolder) holder).tvName.setText(String.format("%s %s", client.getLastName(), client.getFirstName()));
-        ((MyViewHolder) holder).tvArrivalDate.setText(String.format("Заезд: %s", client.getArrivalDate().toString()));
-        ((MyViewHolder) holder).tvCheckOutDate.setText(String.format("Выселение: %s", client.getCheckOutDate()));
+        ((MyViewHolder) holder).tvArrivalDate.setText(String.format("Заезд:\n %s", client.getArrivalDate().toString()));
+        ((MyViewHolder) holder).tvCheckOutDate.setText(String.format("Выселение:\n %s", client.getCheckOutDate()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChangeStudentFragment changeStudentFragment = new ChangeStudentFragment();
+                ChangeClientFragment changeClientFragment = new ChangeClientFragment();
 
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(MainActivity.MSG_NAME, clients.get(position));
-                changeStudentFragment.setArguments(bundle);
+                changeClientFragment.setArguments(bundle);
 
                 ((AppCompatActivity) context).getSupportFragmentManager()
                         .beginTransaction()
-                        .add(R.id.fl_main, changeStudentFragment)
+                        .add(R.id.fl_main, changeClientFragment)
                         .commit();
             }
         });

@@ -25,8 +25,6 @@ public class AddClientFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_add_client, container, false);
 
-
-
         AppCompatButton btn_add = (AppCompatButton) view.findViewById(R.id.btn_add);
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -2,18 +2,21 @@ package com.example.it_fest_student_raiting;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.it_fest_student_raiting.db.ClientDbHelper;
 import com.example.it_fest_student_raiting.fragments.AddClientFragment;
-import com.example.it_fest_student_raiting.fragments.ChangeStudentFragment;
+import com.example.it_fest_student_raiting.fragments.ChangeClientFragment;
 import com.example.it_fest_student_raiting.model.Client;
 
 import java.util.Collections;
@@ -24,10 +27,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String MSG_NAME = "msg";
     AddClientFragment addClientFragment;
-    ChangeStudentFragment changeStudentFragment;
+    ChangeClientFragment changeClientFragment;
     FragmentTransaction transaction;
     FrameLayout frameLayout;
     RecyclerView rv_students;
+
+    CheckBox cbShowAll;
 
     List<Client> clients;
 
@@ -36,16 +41,10 @@ public class MainActivity extends AppCompatActivity {
 
     ItemTouchHelper.SimpleCallback simpleItemTouchCallback;
 
-    boolean showAllClients = false;
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
     public void update() {
         clients.clear();
-        clients.addAll(dbHelper.getClients(showAllClients));
+        clients.addAll(dbHelper.getClients(cbShowAll.isChecked()));
         Collections.sort(clients, new Comparator<Client>() {
             @Override
             public int compare(Client client1, Client client2) {
@@ -60,8 +59,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        cbShowAll = findViewById(R.id.cb_show_all);
+        cbShowAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                update();
+            }
+        });
+
         dbHelper = new ClientDbHelper(this);
-        clients = dbHelper.getClients(showAllClients);
+        clients = dbHelper.getClients(cbShowAll.isChecked());
         Collections.sort(clients, new Comparator<Client>() {
             @Override
             public int compare(Client client1, Client client2) {
@@ -70,15 +77,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         addClientFragment = new AddClientFragment();
-        changeStudentFragment = new ChangeStudentFragment();
+        changeClientFragment = new ChangeClientFragment();
 
         rv_students = findViewById(R.id.rv_students);
         clientAdapter = new ClientAdapter(this, clients);
         rv_students.setAdapter(clientAdapter);
 
-
         frameLayout = findViewById(R.id.fl_main);
-
 
         AppCompatButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -127,5 +132,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         dbHelper.close();
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        int size = fragments.size();
+        if (size > 0)
+            getSupportFragmentManager().beginTransaction().remove(fragments.get(size-1)).commit();
+        else
+            finish();
     }
 }

@@ -139,7 +139,7 @@ public class ClientDbHelper extends SQLiteOpenHelper {
 
             do {
                 Client.Status statusVal = Client.Status.values()[cursor.getInt(status)];
-                if (statusVal == Client.Status.RESIDES) {
+                if (showAll||statusVal == Client.Status.RESIDES) {
                     Client client = new Client(
                             cursor.getInt(idNumber),
                             cursor.getString(lastName),

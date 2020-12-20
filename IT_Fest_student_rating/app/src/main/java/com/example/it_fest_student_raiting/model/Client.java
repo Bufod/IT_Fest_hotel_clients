@@ -10,7 +10,7 @@ public class Client implements Serializable {
 
     public enum Status{
         RESIDES,
-        EVICTED;
+        EVICTED
     }
 
     private int id, amountOfDays;
