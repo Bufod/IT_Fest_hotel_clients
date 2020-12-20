@@ -1,2 +1,0 @@
-include ':app'
-rootProject.name = "IT_Fest_student_raiting"
